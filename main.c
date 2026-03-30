@@ -11,30 +11,7 @@ const int tileSize = 32;
 const int gameWidth = COLUMNS * tileSize;
 const int gameHeight = ROWS * tileSize;
 
-
-typedef struct {
-    Vector2 position;
-    Vector2 direction;
-    Vector2 nextDirection;
-    float speed;
-    float radius;
-    Color color;
-} PacMan;
-
-void makePacMan(PacMan* pacman, float x, float y) {
-    pacman->position = (Vector2){x, y};
-    pacman->direction = (Vector2){1, 0};
-    pacman->nextDirection = (Vector2){1, 0};
-    pacman->speed = 0.05f;
-    pacman->radius = 16.0f;
-    pacman->color = YELLOW;
-}
-
-
-
-int main() 
-{
-    int map[ROWS][COLUMNS] = {
+int map[ROWS][COLUMNS] = {
     {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
     {1,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,1},
     {1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,2,2,1},
@@ -53,7 +30,38 @@ int main()
     };
     // 0 = empty, 1 = wall, 2 = pellet
 
+typedef struct {
+    Vector2 position;
+    Vector2 direction;
+    Vector2 nextDirection;
+    float speed;
+    float radius;
+    Color color;
+} PacMan;
 
+void makePacMan(PacMan* pacman, float x, float y) {
+    pacman->position = (Vector2){x, y};
+    pacman->direction = (Vector2){1, 0};
+    pacman->nextDirection = (Vector2){1, 0};
+    pacman->speed = 0.075f;
+    pacman->radius = 16.0f;
+    pacman->color = YELLOW;
+}
+
+int checkCollision(PacMan* pacman) {
+    float next_x = pacman->position.x + pacman->direction.x * pacman->speed;
+    float next_y = pacman->position.y + pacman->direction.y * pacman->speed;
+
+    int next_column = (int)floorf(next_x);
+    int next_row = (int)floorf(next_y);
+
+    if (next_column < 0 || next_column >= COLUMNS || next_row < 0 || next_row >= ROWS) return 1;
+    return map[next_row][next_column] == 1;
+}
+
+
+int main() 
+{
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 
     InitWindow(800, 600, "Pac-Man");
@@ -68,9 +76,6 @@ int main()
     while (!WindowShouldClose()) 
     {
         // Begin drawing to the off-screen render texture
-        
-        
-        
         BeginTextureMode(target);
         ClearBackground(BLACK); 
         for (int i = 0; i < ROWS; i++)  
@@ -119,8 +124,10 @@ int main()
         if(IsKeyPressed(KEY_UP)) pacman.direction = (Vector2){0, -1};
         if(IsKeyPressed(KEY_DOWN)) pacman.direction = (Vector2){0, 1};
 
-        pacman.position.x += pacman.direction.x * pacman.speed;
-        pacman.position.y += pacman.direction.y * pacman.speed;
+        if (!checkCollision(&pacman)) {
+            pacman.position.x += pacman.direction.x * pacman.speed;
+            pacman.position.y += pacman.direction.y * pacman.speed;
+        }
     }
     CloseWindow();
     return 0;
