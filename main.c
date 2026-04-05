@@ -2,30 +2,23 @@
 #include <math.h>
 #include "raylib.h"
 
-#define ROWS 15
-#define COLUMNS 19
-
-const int tileSize = 32;
-
-
-const int gameWidth = COLUMNS * tileSize;
-const int gameHeight = ROWS * tileSize;
+#include "map.h"
 
 int map[ROWS][COLUMNS] = {
     {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-    {1,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,1},
-    {1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,2,2,1},
-    {1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1},
-    {1,2,1,1,2,1,2,1,1,1,1,1,2,1,2,1,1,2,1},
-    {1,2,2,2,2,1,2,2,2,1,2,2,2,1,2,2,2,2,1},
-    {1,2,1,1,2,1,1,1,0,0,0,1,1,1,2,1,1,2,1},
-    {1,2,1,1,2,1,0,0,0,0,0,0,0,1,2,1,1,2,1},
-    {1,2,1,1,2,1,0,1,1,1,1,1,0,1,2,1,1,2,1},
-    {1,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,1},
-    {1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,2,2,1},
-    {1,2,2,1,2,2,2,2,2,2,2,2,2,2,2,1,2,2,1},
     {1,1,2,1,2,1,2,1,1,1,1,1,2,1,2,1,2,1,1},
-    {1,2,2,2,2,1,2,2,2,1,2,2,2,1,2,2,2,2,1},
+    {1,1,2,1,2,1,2,1,1,1,1,1,2,1,2,1,2,1,1},
+    {1,1,2,1,2,1,2,1,1,1,1,1,2,1,2,1,2,1,1},
+    {1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1},
+    {1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1},
+    {1,1,1,1,2,2,2,2,0,0,0,2,2,2,2,1,1,1,1},
+    {1,1,1,1,2,2,2,2,0,0,0,2,2,2,2,1,1,1,1},
+    {1,1,1,1,2,2,2,2,0,0,0,2,2,2,2,1,1,1,1},
+    {1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1},
+    {1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1},
+    {1,1,2,1,2,1,2,1,1,1,1,1,2,1,2,1,2,1,1},
+    {1,1,2,1,2,1,2,1,1,1,1,1,2,1,2,1,2,1,1},
+    {1,1,2,1,2,1,2,1,1,1,1,1,2,1,2,1,2,1,1},
     {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
     };
     // 0 = empty, 1 = wall, 2 = pellet
@@ -49,8 +42,8 @@ void makePacMan(PacMan* pacman, float x, float y) {
 }
 
 int checkCollision(PacMan* pacman) {
-    float next_x = pacman->position.x + pacman->direction.x * pacman->speed;
-    float next_y = pacman->position.y + pacman->direction.y * pacman->speed;
+    float next_x = pacman->position.x + pacman->nextDirection.x * pacman->speed;
+    float next_y = pacman->position.y + pacman->nextDirection.y * pacman->speed;
 
     int next_column = (int)floorf(next_x);
     int next_row = (int)floorf(next_y);
@@ -66,7 +59,7 @@ int main()
 
     InitWindow(800, 600, "Pac-Man");
 
-    RenderTexture2D target = LoadRenderTexture(gameWidth, gameHeight);
+    RenderTexture2D target = LoadRenderTexture(GAME_WIDTH, GAME_HEIGHT);
 
     SetTargetFPS(60);
 
@@ -75,58 +68,31 @@ int main()
 
     while (!WindowShouldClose()) 
     {
-        // Begin drawing to the off-screen render texture
         BeginTextureMode(target);
-        ClearBackground(BLACK); 
-        for (int i = 0; i < ROWS; i++)  
-        {
-            for (int j = 0; j < COLUMNS; j++)
-            {
-                int tile = map[i][j];
-                if (tile == 1) DrawRectangle(j * tileSize, i * tileSize, tileSize, tileSize, DARKBLUE);
-                if (tile == 2)DrawCircle(j * tileSize + tileSize/2,
-                                i * tileSize + tileSize/2,
-                                4,
-                                WHITE);
-                //Draw the tile based on its type
-            }
-        }
-        DrawCircle(pacman.position.x * tileSize + tileSize/2,
-                   pacman.position.y * tileSize + tileSize/2,
-                   pacman.radius,
-                   pacman.color);
+            renderMap(map);
+            DrawCircle(pacman.position.x * TILE_SIZE + TILE_SIZE/2,
+                    pacman.position.y * TILE_SIZE + TILE_SIZE/2,
+                    pacman.radius,
+                    pacman.color);
         EndTextureMode();
 
-        BeginDrawing();
-        float scale = fmin(
-            (float)GetScreenWidth() / gameWidth,
-            (float)GetScreenHeight() / gameHeight
-        );
-        DrawTexturePro(
-            target.texture,
-            (Rectangle){0, 0, gameWidth, -gameHeight},
-            (Rectangle){
-                (GetScreenWidth() - gameWidth * scale) / 2,
-                (GetScreenHeight() - gameHeight * scale) / 2,
-                gameWidth * scale,
-                gameHeight * scale
-            },
-            (Vector2){0, 0},
-            0.0f,
-            WHITE
-        );
-        if (IsKeyPressed(KEY_F)) ToggleFullscreen();
-        EndDrawing();
-        //End drawing to the off-screen render texture
+        drawMap(target, map);
 
-        if(IsKeyPressed(KEY_RIGHT)) pacman.direction = (Vector2){1, 0};
-        if(IsKeyPressed(KEY_LEFT)) pacman.direction = (Vector2){-1, 0};
-        if(IsKeyPressed(KEY_UP)) pacman.direction = (Vector2){0, -1};
-        if(IsKeyPressed(KEY_DOWN)) pacman.direction = (Vector2){0, 1};
+                
+        if (IsKeyPressed(KEY_F)) ToggleFullscreen();
+
+        if(IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) pacman.nextDirection = (Vector2){1, 0};
+        if(IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) pacman.nextDirection = (Vector2){-1, 0};
+        if(IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) pacman.nextDirection = (Vector2){0, -1};
+        if(IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) pacman.nextDirection = (Vector2){0, 1};
 
         if (!checkCollision(&pacman)) {
-            pacman.position.x += pacman.direction.x * pacman.speed;
-            pacman.position.y += pacman.direction.y * pacman.speed;
+            float pacman_center_x = pacman.position.x * TILE_SIZE + TILE_SIZE/2;
+            float pacman_center_y = pacman.position.y * TILE_SIZE + TILE_SIZE/2;
+
+            
+            pacman.position.x += pacman.nextDirection.x * pacman.speed;
+            pacman.position.y += pacman.nextDirection.y * pacman.speed;
         }
     }
     CloseWindow();
