@@ -9,9 +9,12 @@ typedef struct PacMan* PacMan_t;
 
 void drawPacMan(PacMan_t pacman);
 PacMan_t makePacMan(PacMan_t pacman, float x, float y);
-int checkCollision(PacMan_t pacman, int map[ROWS][COLUMNS]);
+int checkDirection(PacMan_t pacman, int map[ROWS][COLUMNS]);
+int checkNextDirection(PacMan_t pacman, int map[ROWS][COLUMNS]);
+void updateDirection(PacMan_t pacman);
 void getPacmanInput(PacMan_t pacman);
 void updatePacMan(PacMan_t pacman, int map[ROWS][COLUMNS]);
-int isWall(int, int, int map[ROWS][COLUMNS]);
+
+
 
 #endif
