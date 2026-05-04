@@ -14,6 +14,11 @@ int checkNextDirection(PacMan_t pacman, int map[ROWS][COLUMNS]);
 void updateDirection(PacMan_t pacman);
 void getPacmanInput(PacMan_t pacman);
 void updatePacMan(PacMan_t pacman, int map[ROWS][COLUMNS]);
+int checkCurrentTile(PacMan_t pacman, int map[ROWS][COLUMNS]);
+void updateTile(PacMan_t pacman, int map[ROWS][COLUMNS]);
+int checkStatus(PacMan_t pacman);
+void powerUp(PacMan_t pacman);
+void powerDown(PacMan_t pacman);
 
 
 

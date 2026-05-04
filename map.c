@@ -17,6 +17,10 @@ void renderMap(int map[ROWS][COLUMNS])
                                 i * TILE_SIZE + TILE_SIZE/2,
                                 4,
                                 WHITE);
+                if (tile == 3) DrawCircle(j * TILE_SIZE + TILE_SIZE/2,
+                                i * TILE_SIZE + TILE_SIZE/2,
+                                8,
+                                ORANGE);
             }
         }
     //EndTextureMode();

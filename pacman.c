@@ -12,6 +12,7 @@ struct PacMan
     Vector2 nextDirection;
     float radius;
     Color color;
+    int status; // 0 = normal, 1 = powered up
 };
 
 void drawPacMan(PacMan_t pacman) 
@@ -30,6 +31,7 @@ PacMan_t makePacMan(PacMan_t pacman, float x, float y)
     pacman->nextDirection = (Vector2){1, 0};
     pacman->radius = 16.0f;
     pacman->color = YELLOW;
+    pacman->status = 0;
     return pacman;
 }
 
@@ -70,3 +72,35 @@ void updatePacMan(PacMan_t pacman, int map[ROWS][COLUMNS])
     pacman->position.y += pacman->direction.y;
 }
 
+
+int checkCurrentTile(PacMan_t pacman, int map[ROWS][COLUMNS]) 
+{
+    int current_column = pacman->position.x;
+    int current_row = pacman->position.y;
+
+    return map[current_row][current_column];
+}
+
+void updateTile(PacMan_t pacman, int map[ROWS][COLUMNS]) 
+{
+    int current_column = pacman->position.x;
+    int current_row = pacman->position.y;
+    map[current_row][current_column] = 0;
+}
+
+void powerUp(PacMan_t pacman)
+{
+    pacman->status = 1;
+    pacman->color = GREEN;
+}
+
+void powerDown(PacMan_t pacman)
+{
+    pacman->status = 0;
+    pacman->color = YELLOW;
+}
+
+int checkStatus(PacMan_t pacman)
+{
+    return pacman->status;
+}
