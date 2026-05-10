@@ -61,12 +61,12 @@ int checkNextDirection(PacMan_t pacman, int map[ROWS][COLUMNS])
     return 1;
 }
 
-void updateDirection(PacMan_t pacman) 
+void updatePacmanDirection(PacMan_t pacman) 
 {
     pacman->direction = pacman->nextDirection;
 }
 
-void updatePacMan(PacMan_t pacman, int map[ROWS][COLUMNS]) 
+void updatePacMan(PacMan_t pacman) 
 {   
     pacman->position.x += pacman->direction.x;
     pacman->position.y += pacman->direction.y;
@@ -103,4 +103,9 @@ void powerDown(PacMan_t pacman)
 int checkStatus(PacMan_t pacman)
 {
     return pacman->status;
+}
+
+Vector2 getPacmanPosition(PacMan_t pacman)
+{
+    return pacman->position;
 }
