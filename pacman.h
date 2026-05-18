@@ -20,6 +20,7 @@ int checkStatus(PacMan_t pacman);
 void powerUp(PacMan_t pacman);
 void powerDown(PacMan_t pacman);
 Vector2 getPacmanPosition(PacMan_t pacman);
+Vector2 getPacmanNextPosition(PacMan_t pacman);
 
 
 

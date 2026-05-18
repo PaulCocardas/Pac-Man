@@ -109,3 +109,11 @@ Vector2 getPacmanPosition(PacMan_t pacman)
 {
     return pacman->position;
 }
+
+Vector2 getPacmanNextPosition(PacMan_t pacman)
+{
+    Vector2 next_position;
+    next_position.x = pacman->position.x + pacman->direction.x;
+    next_position.y = pacman->position.y + pacman->direction.y;
+    return next_position;
+}

@@ -40,32 +40,22 @@ Ghost_t makeGhost(Ghost_t ghost, float x, float y, Color color)
     return ghost;
 }
 
-void updateGhostStatusRed(Ghost_t ghost) 
+void freightenGhost(Ghost_t ghost) 
 {
-    if(ghost->status == 1) 
-    {
-        ghost->status = 0;
-        ghost->color = RED;
-    }
-    else
-    {
-        ghost->color = BLUE;
-        ghost->status = 1;
-    }
+    ghost->status = 1;
+    ghost->color = BLUE;
 }
 
-void updateGhostStatusPink(Ghost_t ghost) 
+void unfreightenRed(Ghost_t ghost) 
 {
-    if(ghost->status == 1) 
-    {
-        ghost->status = 0;
-        ghost->color = PINK;
-    }
-    else
-    {
-        ghost->color = BLUE;
-        ghost->status = 1;
-    }
+    ghost->status = 0;
+    ghost->color = RED;
+}
+
+void unfreightenPink(Ghost_t ghost) 
+{
+    ghost->status = 0;
+    ghost->color = PINK;
 }
 
 int calcPacmanGhostDistance(PacMan_t pacman, Vector2 ghost_position) 
@@ -97,6 +87,27 @@ void updateGhostDirection(Ghost_t ghost, PacMan_t pacman, int map[ROWS][COLUMNS]
     }
 }
 
+void updateGhostDirectionFreightened(Ghost_t ghost, PacMan_t pacman, int map[ROWS][COLUMNS]) 
+{
+    int bestDistance = -1;
+    for(int i = 0; i < 4; i++) 
+    {
+        if(ghost->direction.x == -directions[i].x && ghost->direction.y == -directions[i].y) continue;
+        int next_column = ghost->position.x + directions[i].x;
+        int next_row = ghost->position.y + directions[i].y;
+        if(map[next_row][next_column] != 1) 
+        {
+            Vector2 next_position = {ghost->position.x + directions[i].x, ghost->position.y + directions[i].y};
+            int distance = calcPacmanGhostDistance(pacman, next_position);
+            if(distance > bestDistance)             
+            {
+                bestDistance = distance;
+                ghost->direction = directions[i];
+            }
+        }
+    }
+}
+
 void updateGhostPosition(Ghost_t ghost) 
 {
     ghost->position.x += ghost->direction.x;
@@ -112,7 +123,7 @@ int checkIntersection(Ghost_t ghost, int map[ROWS][COLUMNS])
 {
    for(int i = 0; i < 4; i++) 
    {
-        if(ghost->direction.x == directions[i].x && ghost->direction.y == directions[i].y) continue;
+        //if(ghost->direction.x == directions[i].x && ghost->direction.y == directions[i].y) continue;
         int next_column = ghost->position.x + directions[i].x;
         int next_row = ghost->position.y + directions[i].y;
         if(map[next_row][next_column] != 1) 
@@ -121,4 +132,37 @@ int checkIntersection(Ghost_t ghost, int map[ROWS][COLUMNS])
         }
    }
    return 0;
+}
+
+Vector2 getGhostPosition(Ghost_t ghost) 
+{
+    return ghost->position;
+}
+
+void resetGhostPosition(Ghost_t ghost, float x, float y)
+{
+    ghost->position = (Vector2){x, y};
+}
+
+int checkCollision(Ghost_t ghost, PacMan_t pacman)
+{
+    Vector2 pacmanPos = getPacmanPosition(pacman);
+    Vector2 pacmanNextPos = getPacmanNextPosition(pacman);
+
+    Vector2 ghostPos = getGhostPosition(ghost);
+    Vector2 ghostNextPos = {ghostPos.x + ghost->direction.x, ghostPos.y + ghost->direction.y};
+
+    if(pacmanPos.x == ghostPos.x && pacmanPos.y == ghostPos.y)
+    {
+        return 1; 
+    }
+    // if(pacmanNextPos.x == ghostPos.x && pacmanNextPos.y == ghostPos.y)
+    // {
+    //     return 1; 
+    // }
+    // if(pacmanPos.x == ghostNextPos.x && pacmanPos.y == ghostNextPos.y)
+    // {
+    //     return 1;
+    // }
+    return 0;
 }
